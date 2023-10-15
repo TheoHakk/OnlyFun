@@ -9,3 +9,13 @@ const port = 3001;
 app.listen(port, () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 });
+
+
+app.get('/GetVideoGame', (req, res) => {
+    res.send('Hello World!');
+});
+
+
+app.post('/PostNewCommentary', (req, res) => {
+    console.log(req.body);
+});
