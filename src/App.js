@@ -3,94 +3,132 @@ import './App.css';
 
 
 
+
+
+
+
 function App() {
-    let source= "https://images4.alphacoders.com/108/1083979.jpg";
-    let videoGameName= "Satisfactory";
-  return (
-      <div >
-        <GamePictureHeader source={source} videoGameName={videoGameName}/>
-          <GameDescriptionInformations/>
-          <Video/>
-          <CommentarySection/>
-          <Bottom/>
-      </div>
-  );
+    let videoGame = {
+        name: "Satisfactory",
+        source: "https://images4.alphacoders.com/108/1083979.jpg",
+        description: "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Pioneering for FICSIT Incorporated means charting and exploiting an alien planet, battling alien lifeforms, creating multi-story factories, entering conveyor belt heaven, automating vehicles, and researching new technologies.",
+        informations: {
+            genre: "Adventure, Indie, Simulation",
+            releaseDate: "19 Mar, 2019",
+            developer: "Coffee Stain Studios",
+            publisher: "Coffee Stain Publishing"
+        },
+        video: "https://www.youtube.com/embed/8PGepeXVkG4?si=KgswNEI6TM5Ha4qe",
+        commentaries : [
+            {
+                name: "John Doe",
+                date: "19/03/2019",
+                commentary: "This game is awesome!",
+                source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            },
+            {
+                name: "Jane dane",
+                date: "19/03/2019",
+                commentary: "This game is holy boly!",
+                source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            }]
+    }
+
+
+    return (
+        <div>
+            <GamePictureHeader source={videoGame.source} videoGameName={videoGame.name}/>
+            <GameDescriptionInformations videoGame={videoGame}/>
+            <Video source={videoGame.video}/>
+            <CommentarySection videoGame={videoGame}/>
+            <Bottom/>
+        </div>
+    );
 }
 
 
 function GamePictureHeader(props) {
-
-  return (
-    <div>
-        <div className="relative w-full mx-auto">
-            <img src={props.source} className="h-80 w-full object-cover shadow-2xl" alt={props.videoGameName}/>
-            <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-            <div className="absolute inset-0 flex justify-center items-center">
-                <div className="text-center">
-                    <h1 className="text-5xl font-bold text-white uppercase lg:text-7xl">{props.videoGameName}</h1>
+    return (
+        <div>
+            <div className="relative w-full mx-auto">
+                <img src={props.source} className="h-80 w-full object-cover shadow-2xl" alt={props.videoGameName}/>
+                <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+                <div className="absolute inset-0 flex justify-center items-center">
+                    <div className="text-center">
+                        <h1 className="text-5xl font-bold text-white uppercase lg:text-7xl">{props.videoGameName}</h1>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-  );
+    );
 }
 
-function GameDescriptionInformations(){
+function GameDescriptionInformations(props){
     return (
         <div>
             <div className="flex flex-row items-center justify-center m-40 shadow-2xl p-6 rounded-bl ">
-                <GameDescription />
-                <GameInformations />
+                <GameDescription description={props.videoGame.description}/>
+                <GameInformations informations ={props.videoGame.informations}/>
             </div>
         </div>
     );
 }
 
-function GameDescription(){
+function GameDescription(props){
     return (
         <div>
             <h1 className="text-3xl font-bold text-justify uppercase ">Description</h1>
-            <p>Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Pioneering for FICSIT Incorporated means charting and exploiting an alien planet, battling alien lifeforms, creating multi-story factories, entering conveyor belt heaven, automating vehicles, and researching new technologies.</p>
+            <p> {props.description}</p>
         </div>
     );
 }
 
-function GameInformations(){
+function Information(props) {
+    return (
+        <div>
+            <p className="font-normal">{props.titre} : {props.detail}</p>
+        </div>
+    );
+}
+
+function GameInformations(props){
     return(
         <div>
             <div className="flex-col p-6 rounded-lg border-solid border-2 border-amber-600 ml-10 ">
                 <h1 className="text-3xl font-bold uppercase">Informations</h1>
-                <p className="text-center">Genre: Adventure, Indie, Simulation</p>
-                <p className="text-center">Release Date: 19 Mar, 2019</p>
-                <p className="text-center">Developer: Coffee Stain Studios</p>
-                <p className="text-center">Publisher: Coffee Stain Publishing</p>
+                <Information titre={"Genre"} detail={props.informations.genre}/>
+                <Information titre={"Date"} detail={props.informations.releaseDate}/>
+                <Information titre={"Développeur"} detail={props.informations.developer}/>
+                <Information titre={"Publieur"} detail={props.informations.publisher}/>
             </div>
         </div>
     );
 }
 
 
-function Video() {
+function Video(props) {
     return (
         <div className="flex flex-row items-center justify-center m-40 shadow-2xl p-24 rounded-bl border-solid">
-            <iframe className="shadow-2xl rounded-lg" width="750" height="450" src="https://www.youtube.com/embed/8PGepeXVkG4?si=KgswNEI6TM5Ha4qe" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+            <iframe className="shadow-2xl rounded-lg" width="750" height="450" src={props.source} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
         </div>
     );
 }
 
-function CommentarySection(){
+function CommentarySection(props){
     return(
         <div className="flex flex-col items-center justify-center">
-            <Commentaries/>
+            <Commentaries videoGame={props.videoGame}/>
             <NewCommentary/>
         </div>
     )
 }
 
 function Commentaries(props){
-    return(
-        <div className="rounded-lg border-solid border-2  w-1/2 shadow-xl">
-            <Commentary source="https://t3.ftcdn.net/jpg/03/53/11/00/360_F_353110097_nbpmfn9iHlxef4EDIhXB1tdTD0lcWhG9.jpg" name="John Doe" date="19/03/2019" commentary="This game is awesome!"/>
+
+    let commentaries = props.videoGame.commentaries;
+    return (
+        <div className="flex flex-col content-start rounded-lg border-solid border-2  w-1/2 h-60 p-2  shadow-xl">
+            {commentaries.map((x) => <Commentary source={x.source} name={x.name} date={x.date} commentary={x.commentary}></Commentary>)}
         </div>
     )
 }
@@ -123,7 +161,7 @@ function NewCommentary(props){
                     active:border-b-[0px]
                     transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841]
                     rounded-full  border-[1px] border-blue-400'>
-                <span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg '>Send</span>
+                <span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg mb-12'>Send</span>
             </div>
         </div>
     )
