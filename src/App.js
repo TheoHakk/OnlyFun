@@ -23,7 +23,7 @@ function App() {
                     <Bottom/>
                 </div>
             ) : (
-                <p>Chargement en cours...</p>
+                <h1>Chargement en cours...</h1>
             )}
         </div>
     );
@@ -151,7 +151,7 @@ function NewCommentary(props){
     };
 
     const sendNewCommentary = () => {
-        if (commentary != "" && name != "") {
+        if (commentary !== "" && name !== "") {
            const newCommentary = {
                 name: name,
                 date: "19/03/2019",
@@ -163,13 +163,22 @@ function NewCommentary(props){
 
            setName("") ;
            setCommentary("");
+
+           fetch('http://localhost:3001/PostNewCommentary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newCommentary)
+              }).then((response) => {
+                if (response.ok) {
+                    console.log("Commentaire envoyé");
+                } else {
+                    console.log("Erreur lors de l'envoi du commentaire");
+                }
+           })
         }
-    }
-
-
-
-
-
+    };
     return(
         <div className="flex flex-col content-start rounded-lg border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
             <input className="rounded-lg border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text" placeholder="Name" id="NewCommentaryName" onChange={handleNameChange}/>

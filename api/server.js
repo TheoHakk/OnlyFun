@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const sqlite3 = require ('sqlite3').verbose();
 
 app.use(express.json());
 app.use(cors());
+let db = new sqlite3.Database('./db/onlyfunDatabase.db');
 
 const port = 3001;
 
@@ -40,12 +42,21 @@ app.listen(port, () => {
 
 
 app.get('/GetVideoGame', (req, res) => {
-    console.log("GetVideoGame");
-    console.log(videoGame);
-    res.send(videoGame);
+    db.all(`SELECT * FROM VideoGames WHERE ID = ${req.query.id}`, (err, rows) => {
+        res.json(rows);
+    });
 });
 
+app.get('/GetCommentaries', (req, res) => {
+    db.run(`SELECT * FROM Commentaries WHERE VideoGameID = ${req.query.id}`, (err, rows) => {
+       res.json(rows);
+    });
+});
 
 app.post('/PostNewCommentary', (req, res) => {
-    console.log(req.body);
+
+    videoGame.commentaries = [...videoGame.commentaries, req.body];
+
+    console.log(videoGame.commentaries);
 });
+
