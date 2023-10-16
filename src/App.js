@@ -1,45 +1,30 @@
 import './App.css';
-import {useState} from "react";
-
-
-let videoGame = {
-    name: "Satisfactory",
-    source: "https://images4.alphacoders.com/108/1083979.jpg",
-    description: "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Pioneering for FICSIT Incorporated means charting and exploiting an alien planet, battling alien lifeforms, creating multi-story factories, entering conveyor belt heaven, automating vehicles, and researching new technologies.",
-    informations: {
-        genre: "Adventure, Indie, Simulation",
-        releaseDate: "19 Mar, 2019",
-        developer: "Coffee Stain Studios",
-        publisher: "Coffee Stain Publishing"
-    },
-    video: "https://www.youtube.com/embed/8PGepeXVkG4?si=KgswNEI6TM5Ha4qe",
-    commentaries : [
-        {
-            name: "John Doe",
-            date: "19/03/2019",
-            commentary: "This game is awesome!",
-            source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-        },
-        {
-            name: "Jane dane",
-            date: "19/03/2019",
-            commentary: "This game is holy boly!",
-            source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-        }]
-};
-
+import {useState, useEffect} from "react";
 
 function App() {
 
+    const [videoGame, setVideoGame] = useState(null);
 
+    useEffect(() => {
+        fetch('http://localhost:3001/GetVideoGame')
+            .then((response) => response.json())
+            .then((data) => setVideoGame(data));
+    },[]);
+    console.log(videoGame);
 
     return (
         <div>
-            <GamePictureHeader source={videoGame.source} videoGameName={videoGame.name}/>
-            <GameDescriptionInformations videoGame={videoGame}/>
-            <Video source={videoGame.video}/>
-            <CommentarySection videoGame={videoGame}/>
-            <Bottom/>
+            {videoGame!=null ? (
+                <div>
+                    <GamePictureHeader source={videoGame.source} videoGameName={videoGame.name}/>
+                    <GameDescriptionInformations videoGame={videoGame}/>
+                    <Video source={videoGame.video}/>
+                    <CommentarySection commentaries={videoGame.commentaries}/>
+                    <Bottom/>
+                </div>
+            ) : (
+                <p>Chargement en cours...</p>
+            )}
         </div>
     );
 }
@@ -113,21 +98,24 @@ function Video(props) {
 }
 
 function CommentarySection(props){
-    let [commentaries, setCommentaries] = useState(props.videoGame.commentaries);
+    const onNewCommentary = () => {
+      console.log("Coucou")
+    };
 
+    const [commentaries, setCommentaries] = useState(props.commentaries)
     return(
         <div className="flex flex-col items-center justify-center">
-            <Commentaries videoGame={commentaries}/>
-            <NewCommentary />
+            <Commentaries commentaries={commentaries}/>
+            <NewCommentary commentaries={commentaries} setCommentaries={setCommentaries} onNewCommentary={onNewCommentary}/>
         </div>
     )
 }
 
 function Commentaries(props){
-    let commentaries = props.videoGame.commentaries;
     return (
-        <div className="flex flex-col content-start rounded-lg border-solid border-2  w-2/3 h-60 p-2  shadow-xl">
-            {commentaries.map((x) => <Commentary source={x.source} name={x.name} date={x.date} commentary={x.commentary}></Commentary>)}
+        <div className="flex flex-col content-start rounded-lg border-solid border-2  w-2/3 p-2  shadow-xl overflow-auto">
+            {props.commentaries.map((x) =>
+                <Commentary source={x.source} name={x.name} date={x.date} commentary={x.commentary}></Commentary>)}
         </div>
     )
 }
@@ -135,7 +123,7 @@ function Commentaries(props){
 function Commentary(props){
     return(
         <div className="flex flex-row p-2 w-full">
-            <img src={props.source} className="h-10 rounded-full m-1.5"/>
+            <img src={props.source} className="h-10 rounded-full m-1.5" alt={props.source}/>
             <div className="rounded-lg border-solid border-2 bg-slate-100 w-full pl-2">
                 <div className="flex flex-row">
                     <h1 className="mr-6 font-semibold">{props.name}</h1>
@@ -150,36 +138,51 @@ function Commentary(props){
     )
 }
 
-function NewCommentary(){
+function NewCommentary(props){
+
+    const [name, setName] = useState(""); // État pour le nom
+    const [commentary, setCommentary] = useState("");
+    const handleNameChange = (e) => {
+        setName(e.target.value); //Va aller récupérér la valeur de son origine, un peu comme un délégué
+    };
+
+    const handleCommentaryChange = (e) => {
+       setCommentary(e.target.value);
+    };
+
+    const sendNewCommentary = () => {
+        if (commentary != "" && name != "") {
+           const newCommentary = {
+                name: name,
+                date: "19/03/2019",
+                commentary: commentary,
+                source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+           };
+           //les ... permettent de faire une copie du tableau
+           props.setCommentaries([...props.commentaries, newCommentary]);
+
+           setName("") ;
+           setCommentary("");
+        }
+    }
+
+
+
+
+
     return(
         <div className="flex flex-col content-start rounded-lg border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
-            <input className="rounded-lg border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text" placeholder="Name" id="NewCommentaryName"/>
-            <input className="rounded-lg border-solid border-2 bg-slate-100 w-full pl-2 h-4/5" type="" placeholder="Commentary" id="NewCommentaryCommentary"/>
-            <div className='button w-20 h-14 bg-blue-500  cursor-pointer select-none
+            <input className="rounded-lg border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text" placeholder="Name" id="NewCommentaryName" onChange={handleNameChange}/>
+            <input className="rounded-lg border-solid border-2 bg-slate-100 w-full pl-2 h-4/5" type="" placeholder="Commentary" id="NewCommentaryCommentary" onChange={handleCommentaryChange}/>
+            <div className='button content-center w-1/4 bg-blue-500 mb-3 mt-3  cursor-pointer select-none
                     active:translate-y-2  active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841]
                     active:border-b-[0px]
                     transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841]
                     rounded-full  border-[1px] border-blue-400'>
-                <span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg' onClick={couilles}>Send</span>
+                <span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg' onClick={sendNewCommentary}>Confirmer</span>
             </div>
         </div>
     )
-}
-
-function couilles(){
-    console.log("couilles");
-
-
-    fetch('https://localhost:3001/PostNewCommentary', {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ })
-})
-   .then(response => response.json())
-   .then(response => console.log(JSON.stringify(response)))
 }
 
 function Bottom() {
