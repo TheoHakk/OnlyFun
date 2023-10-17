@@ -42,14 +42,23 @@ app.listen(port, () => {
 
 
 app.get('/GetVideoGame', (req, res) => {
-    db.all(`SELECT * FROM VideoGames WHERE ID = ${req.query.id}`, (err, rows) => {
+    console.log(req.query.id);
+    db.all(`SELECT * FROM VideoGame WHERE ID = ${req.query.id}`, (err, rows) => {
         res.json(rows);
+        if(err)
+            console.log(err);
+        else
+            console.log(rows);
     });
 });
 
 app.get('/GetCommentaries', (req, res) => {
-    db.run(`SELECT * FROM Commentaries WHERE VideoGameID = ${req.query.id}`, (err, rows) => {
+    db.all(`SELECT Name, Date, Commentary, PictureSource FROM Commentaries WHERE VideoGameID = ${req.query.id}`, (err, rows) => {
        res.json(rows);
+        if(err)
+            console.log(err);
+        else
+            console.log(rows);
     });
 });
 

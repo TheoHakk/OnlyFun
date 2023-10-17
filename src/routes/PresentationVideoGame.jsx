@@ -1,33 +1,71 @@
-import './App.css';
+
+import '../index.css';
+import '../output.css';
+
 import {useState, useEffect} from "react";
 
-function App() {
+// let videoGame = {
+//     name: "Satisfactory",
+//     source: "https://images4.alphacoders.com/108/1083979.jpg",
+//     description: "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Pioneering for FICSIT Incorporated means charting and exploiting an alien planet, battling alien lifeforms, creating multi-story factories, entering conveyor belt heaven, automating vehicles, and researching new technologies.",
+//     informations: {
+//         genre: "Adventure, Indie, Simulation",
+//         releaseDate: "19 Mar, 2019",
+//         developer: "Coffee Stain Studios",
+//         publisher: "Coffee Stain Publishing"
+//     },
+//     video: "https://www.youtube.com/embed/8PGepeXVkG4?si=KgswNEI6TM5Ha4qe",
+//     commentaries : [
+//         {
+//             name: "John Doe",
+//             date: "19/03/2019",
+//             commentary: "This game is awesome!",
+//             source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+//         },
+//         {
+//             name: "Jane dane",
+//             date: "19/03/2019",
+//             commentary: "This game is holy boly!",
+//             source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+//         }]
+// };
 
-    const [videoGame, setVideoGame] = useState(null);
+
+function PresentationVideoGame() {
+    let [videoGame, setVideoGame] = useState(null);
+    let [commentaries, setCommentaries] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:3001/GetVideoGame')
-            .then((response) => response.json())
-            .then((data) => setVideoGame(data));
-    },[]);
-    console.log(videoGame);
+        Promise.all([
+            fetch(`http://localhost:3001/GetVideoGame?id=1`),
+            fetch(`http://localhost:3001/GetCommentaries?id=1`)
+        ])
+            .then(([resVideoGame, resCommentaries]) =>
+                Promise.all([resVideoGame.json(), resCommentaries.json()])
+            )
+            .then(([fetchedVideoGame, fetchedCommentaries]) => {
+                setVideoGame(fetchedVideoGame[0]); // Utilisez l'index 0 pour obtenir le premier élément du tableau
+                setCommentaries(fetchedCommentaries);
+            });
+    }, []);
 
     return (
         <div>
-            {videoGame!=null ? (
+            {commentaries != null && videoGame != null ? (
                 <div>
-                    <GamePictureHeader source={videoGame.source} videoGameName={videoGame.name}/>
+                    <GamePictureHeader source={videoGame.ImageLink} videoGameName={videoGame.Name}/>
                     <GameDescriptionInformations videoGame={videoGame}/>
-                    <Video source={videoGame.video}/>
-                    <CommentarySection commentaries={videoGame.commentaries}/>
+                    <Video source={videoGame.VideoLink}/>
+                    <CommentarySection commentaries={commentaries}/>
                     <Bottom/>
                 </div>
             ) : (
-                <h1>Chargement en cours...</h1>
+                <p>Chargement en cours...</p>
             )}
         </div>
     );
 }
+
 
 
 function GamePictureHeader(props) {
@@ -50,8 +88,8 @@ function GameDescriptionInformations(props){
     return (
         <div>
             <div className="flex flex-row items-center justify-center m-40 shadow-2xl p-6 rounded-bl ">
-                <GameDescription description={props.videoGame.description}/>
-                <GameInformations informations ={props.videoGame.informations}/>
+                <GameDescription description={props.videoGame.Description}/>
+                <GameInformations videoGame ={props.videoGame}/>
             </div>
         </div>
     );
@@ -66,6 +104,20 @@ function GameDescription(props){
     );
 }
 
+function GameInformations(props){
+    return(
+        <div>
+            <div className="flex-col p-6 rounded-lg border-solid border-2 border-amber-600 ml-10 ">
+                <h1 className="text-3xl font-bold uppercase">Informations</h1>
+                <Information titre={"Genre"} detail={props.videoGame.Genre}/>
+                <Information titre={"Date"} detail={props.videoGame.ReleaseDate}/>
+                <Information titre={"Développeur"} detail={props.videoGame.Developper}/>
+                <Information titre={"Publieur"} detail={props.videoGame.Publisher}/>
+            </div>
+        </div>
+    );
+}
+
 function Information(props) {
     return (
         <div>
@@ -73,22 +125,6 @@ function Information(props) {
         </div>
     );
 }
-
-function GameInformations(props){
-    return(
-        <div>
-            <div className="flex-col p-6 rounded-lg border-solid border-2 border-amber-600 ml-10 ">
-                <h1 className="text-3xl font-bold uppercase">Informations</h1>
-                <Information titre={"Genre"} detail={props.informations.genre}/>
-                <Information titre={"Date"} detail={props.informations.releaseDate}/>
-                <Information titre={"Développeur"} detail={props.informations.developer}/>
-                <Information titre={"Publieur"} detail={props.informations.publisher}/>
-            </div>
-        </div>
-    );
-}
-
-
 function Video(props) {
     return (
         <div className="flex flex-row items-center justify-center m-40 shadow-2xl p-24 rounded-bl border-solid">
@@ -99,10 +135,11 @@ function Video(props) {
 
 function CommentarySection(props){
     const onNewCommentary = () => {
-      console.log("Coucou")
+        console.log("Coucou")
     };
 
     const [commentaries, setCommentaries] = useState(props.commentaries)
+
     return(
         <div className="flex flex-col items-center justify-center">
             <Commentaries commentaries={commentaries}/>
@@ -115,7 +152,7 @@ function Commentaries(props){
     return (
         <div className="flex flex-col content-start rounded-lg border-solid border-2  w-2/3 p-2  shadow-xl overflow-auto">
             {props.commentaries.map((x) =>
-                <Commentary source={x.source} name={x.name} date={x.date} commentary={x.commentary}></Commentary>)}
+                <Commentary source={x.PictureSource} name={x.Name} date={x.Date} commentary={x.Commentary}></Commentary>)}
         </div>
     )
 }
@@ -147,36 +184,39 @@ function NewCommentary(props){
     };
 
     const handleCommentaryChange = (e) => {
-       setCommentary(e.target.value);
+        setCommentary(e.target.value);
     };
 
     const sendNewCommentary = () => {
         if (commentary !== "" && name !== "") {
-           const newCommentary = {
+            const newCommentary = {
                 name: name,
-                date: "19/03/2019",
+                /*Je vais aller obtenir la date sous format DD/MM/YY */
+                date: Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3],
                 commentary: commentary,
                 source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-           };
-           //les ... permettent de faire une copie du tableau
-           props.setCommentaries([...props.commentaries, newCommentary]);
+            };
+            //les ... permettent de faire une copie du tableau
+            props.setCommentaries([...props.commentaries, newCommentary]);
 
-           setName("") ;
-           setCommentary("");
+            setName("") ;
+            setCommentary("");
 
-           fetch('http://localhost:3001/PostNewCommentary', {
+            console.log(Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3]);
+
+            fetch('http://localhost:3001/PostNewCommentary', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(newCommentary)
-              }).then((response) => {
+            }).then((response) => {
                 if (response.ok) {
                     console.log("Commentaire envoyé");
                 } else {
                     console.log("Erreur lors de l'envoi du commentaire");
                 }
-           })
+            })
         }
     };
     return(
@@ -200,4 +240,4 @@ function Bottom() {
     );
 }
 
-export default App;
+export default PresentationVideoGame;
