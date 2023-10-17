@@ -45,9 +45,9 @@ app.get('/GetCommentaries', (req, res) => {
 app.post('/PostNewCommentary', (req, res) => {
     const SqlQuery =
         "INSERT INTO Commentaries (VideoGameID, Name, Date, Commentary, PictureSource) VALUES (?, ?, ?, ?, ?)";
-    const { id, name, date, commentary, source } = req.body;
+    const { id, Name, Date, Commentary, PictureSource } = req.body;
 
-    db.run(SqlQuery, [id, name, date, commentary, source], (err) => {
+    db.run(SqlQuery, [id, Name, Date, Commentary, PictureSource], (err) => {
         if(err)
             console.log(err);
         else

@@ -11,8 +11,6 @@ function PresentationVideoGame() {
     const { id } = useParams();
 
 
-
-
     let [videoGame, setVideoGame] = useState(null);
     let [commentaries, setCommentaries] = useState(null);
 
@@ -113,16 +111,13 @@ function Video(props) {
 }
 
 function CommentarySection(props){
-    const onNewCommentary = () => {
-        console.log("Coucou")
-    };
 
     const [commentaries, setCommentaries] = useState(props.commentaries)
 
     return(
         <div className="flex flex-col items-center justify-center">
             <Commentaries commentaries={commentaries}/>
-            <NewCommentary commentaries={commentaries} setCommentaries={setCommentaries} onNewCommentary={onNewCommentary} id={props.id}/>
+            <NewCommentary commentaries={commentaries} setCommentaries={setCommentaries} id={props.id}/>
         </div>
     )
 }
@@ -170,10 +165,10 @@ function NewCommentary(props){
         if (commentary !== "" && name !== "") {
             const newCommentary = {
                 id: props.id,
-                name: name,
-                date: Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3],
-                commentary: commentary,
-                source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+                Name: name,
+                Date: Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3],
+                Commentary: commentary,
+                PictureSource: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
             };
             //les ... permettent de faire une copie du tableau
             props.setCommentaries([...props.commentaries, newCommentary]);

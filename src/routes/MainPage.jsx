@@ -58,8 +58,6 @@ function Header() {
 }
 
 function VideoGameCard(props) {
-
-
     const link = "/presentation/" + props.id;
     return (
         <a href={link} className="max-w-sm  m-6  bg-white border border-gray-200 rounded-lg shadow-2xl dark:bg-gray-800 dark:border-gray-700">
