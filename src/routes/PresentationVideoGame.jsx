@@ -3,48 +3,26 @@ import '../index.css';
 import '../output.css';
 
 import {useState, useEffect} from "react";
+import {useParams} from "react-router-dom";
 
-// let videoGame = {
-//     name: "Satisfactory",
-//     source: "https://images4.alphacoders.com/108/1083979.jpg",
-//     description: "Satisfactory is a first-person open-world factory building game with a dash of exploration and combat. Pioneering for FICSIT Incorporated means charting and exploiting an alien planet, battling alien lifeforms, creating multi-story factories, entering conveyor belt heaven, automating vehicles, and researching new technologies.",
-//     informations: {
-//         genre: "Adventure, Indie, Simulation",
-//         releaseDate: "19 Mar, 2019",
-//         developer: "Coffee Stain Studios",
-//         publisher: "Coffee Stain Publishing"
-//     },
-//     video: "https://www.youtube.com/embed/8PGepeXVkG4?si=KgswNEI6TM5Ha4qe",
-//     commentaries : [
-//         {
-//             name: "John Doe",
-//             date: "19/03/2019",
-//             commentary: "This game is awesome!",
-//             source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-//         },
-//         {
-//             name: "Jane dane",
-//             date: "19/03/2019",
-//             commentary: "This game is holy boly!",
-//             source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-//         }]
-// };
 
 
 function PresentationVideoGame() {
+    const { id } = useParams();
+
     let [videoGame, setVideoGame] = useState(null);
     let [commentaries, setCommentaries] = useState(null);
 
     useEffect(() => {
         Promise.all([
-            fetch(`http://localhost:3001/GetVideoGame?id=1`),
-            fetch(`http://localhost:3001/GetCommentaries?id=1`)
+            fetch(`http://localhost:3001/GetVideoGame?id=${id}`),
+            fetch(`http://localhost:3001/GetCommentaries?id=${id}`)
         ])
             .then(([resVideoGame, resCommentaries]) =>
                 Promise.all([resVideoGame.json(), resCommentaries.json()])
             )
             .then(([fetchedVideoGame, fetchedCommentaries]) => {
-                setVideoGame(fetchedVideoGame[0]); // Utilisez l'index 0 pour obtenir le premier élément du tableau
+                setVideoGame(fetchedVideoGame[0]);
                 setCommentaries(fetchedCommentaries);
             });
     }, []);
@@ -56,7 +34,7 @@ function PresentationVideoGame() {
                     <GamePictureHeader source={videoGame.ImageLink} videoGameName={videoGame.Name}/>
                     <GameDescriptionInformations videoGame={videoGame}/>
                     <Video source={videoGame.VideoLink}/>
-                    <CommentarySection commentaries={commentaries}/>
+                    <CommentarySection commentaries={commentaries} id={videoGame.ID}/>
                     <Bottom/>
                 </div>
             ) : (
@@ -65,8 +43,6 @@ function PresentationVideoGame() {
         </div>
     );
 }
-
-
 
 function GamePictureHeader(props) {
     return (
@@ -143,7 +119,7 @@ function CommentarySection(props){
     return(
         <div className="flex flex-col items-center justify-center">
             <Commentaries commentaries={commentaries}/>
-            <NewCommentary commentaries={commentaries} setCommentaries={setCommentaries} onNewCommentary={onNewCommentary}/>
+            <NewCommentary commentaries={commentaries} setCommentaries={setCommentaries} onNewCommentary={onNewCommentary} id={props.id}/>
         </div>
     )
 }
@@ -190,8 +166,8 @@ function NewCommentary(props){
     const sendNewCommentary = () => {
         if (commentary !== "" && name !== "") {
             const newCommentary = {
+                id: props.id,
                 name: name,
-                /*Je vais aller obtenir la date sous format DD/MM/YY */
                 date: Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3],
                 commentary: commentary,
                 source: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"

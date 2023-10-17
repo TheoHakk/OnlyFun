@@ -7,9 +7,9 @@ import {
 
 
 import MainPage from "./routes/MainPage";
-import Presentation from "./routes/PresentationVideoGame";
 import Creation from "./routes/CreationVideoGame";
-
+import Presentation from "./routes/PresentationVideoGame";
+import Error from "./routes/Error";
 
 
 function App() {
@@ -17,17 +17,17 @@ function App() {
         {
             path: "/",
             element: <MainPage></MainPage>,
-            errorElement : <div>404</div>
+            errorElement : <Error></Error>
         },
         {
-            path: "/presentation",
+          path: "/presentation/:id",
             element: <Presentation></Presentation>,
-            errorElement : <div>404</div>
+            errorElement : <Error></Error>
         },
         {
             path: "/creation",
             element: <Creation></Creation>,
-            errorElement : <div>404</div>
+            errorElement :<Error></Error>
         }
     ]);
 
