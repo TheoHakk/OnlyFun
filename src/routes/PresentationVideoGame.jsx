@@ -10,6 +10,9 @@ import {useParams} from "react-router-dom";
 function PresentationVideoGame() {
     const { id } = useParams();
 
+
+
+
     let [videoGame, setVideoGame] = useState(null);
     let [commentaries, setCommentaries] = useState(null);
 

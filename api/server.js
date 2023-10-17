@@ -29,17 +29,15 @@ app.get('/GetVideoGame', (req, res) => {
 app.get('/GetAllVideoGames', (req, res) => {
     db.all(`SELECT ID, Name, Description, ImageLink FROM VideoGame`, (err, rows) => {
         console.log(rows);
-
         res.json(rows);
     });
 });
 
 app.get('/GetCommentaries', (req, res) => {
-    db.all(`SELECT Name, Date, Commentary, PictureSource FROM Commentaries WHERE VideoGame`, (err, rows) => {
-        if(err)
-            console.log(err);
-        else
-            console.log(rows);
+    const sqlQuery = `SELECT * FROM Commentaries WHERE VideoGameID = ${req.query.id}`;
+
+    db.all(sqlQuery, (err, rows) => {
+        console.log(rows);
         res.json(rows);
     });
 });
