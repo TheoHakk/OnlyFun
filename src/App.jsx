@@ -28,9 +28,12 @@ function App() {
             path: "/creation",
             element: <Creation></Creation>,
             errorElement :<Error></Error>
+        },
+        {
+            path: "/404",
+            element: <Error></Error>
         }
     ]);
-
 
     ReactDOM.createRoot(document.getElementById("root")).render(
         <React.StrictMode>

@@ -14,15 +14,15 @@ app.listen(port, () => {
 });
 
 app.get('/GetVideoGame', (req, res) => {
-    console.log(req.query.id);
+
     const sqlQuery = `SELECT * FROM VideoGame WHERE ID = (?)`;
 
     db.all(sqlQuery, req.query.id, (err, rows) => {
-        res.json(rows);
-        if(err)
-            console.log(err);
+        //Check if the rows are empty
+        if(rows.length === 0)
+            res.sendStatus(404);
         else
-            console.log(rows);
+            res.json(rows);
     });
 });
 

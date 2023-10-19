@@ -4,7 +4,7 @@ import '../output.css';
 
 import {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
-
+import Error from "./Error";
 
 
 function PresentationVideoGame() {
@@ -25,8 +25,11 @@ function PresentationVideoGame() {
             .then(([fetchedVideoGame, fetchedCommentaries]) => {
                 setVideoGame(fetchedVideoGame[0]);
                 setCommentaries(fetchedCommentaries);
+            })
+            .catch(error => {
+                window.location.href = "/404";
             });
-    }, []);
+    }, [id]);
 
     return (
         <div>
@@ -163,6 +166,8 @@ function NewCommentary(props){
 
     const sendNewCommentary = () => {
         if (commentary !== "" && name !== "") {
+            console.log(name)
+            console.log(commentary)
             const newCommentary = {
                 id: props.id,
                 Name: name,
@@ -196,7 +201,7 @@ function NewCommentary(props){
     return(
         <div className="flex flex-col content-start rounded-lg border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
             <input className="rounded-lg border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text" placeholder="Name" id="NewCommentaryName" onChange={handleNameChange}/>
-            <input className="rounded-lg border-solid border-2 bg-slate-100 w-full pl-2 h-4/5" type="" placeholder="Commentary" id="NewCommentaryCommentary" onChange={handleCommentaryChange}/>
+            <textarea className="rounded-lg border-solid border-2 bg-slate-100 w-full pl-2 h-4/5" type="" placeholder="Commentary" id="NewCommentaryCommentary" onChange={handleCommentaryChange}></textarea>
             <div className='button content-center w-1/4 bg-blue-500 mb-3 mt-3  cursor-pointer select-none
                     active:translate-y-2  active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841]
                     active:border-b-[0px]
