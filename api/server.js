@@ -56,3 +56,18 @@ app.post('/PostNewCommentary', (req, res) => {
 
 });
 
+
+app.post('/PostNewVideoGame', (req, res) => {
+    const SqlQuery =
+        "INSERT INTO VideoGame (Name, ImageLink, Description, Genre, ReleaseDate, Developper, Publisher, VideoLink) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const { Name, ImageLink, Description, Genre, ReleaseDate, Developper, Publisher, VideoLink } = req.body;
+
+    db.run(SqlQuery, [Name, ImageLink, Description, Genre, ReleaseDate, Developper, Publisher, VideoLink], (err) => {
+        if(err){
+            console.log(req.body)
+            console.log(err);
+        }else
+            console.log("Jeu ajouté")
+    });
+});
+
