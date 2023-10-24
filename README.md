@@ -5,7 +5,7 @@ Bienvenue sur le projet Onlyfun, une plateforme de jeux vidéo développée en u
 Onlyfun est conçu dans le cadre du cours de Web B3 info à la HELHa de Tournai.
 
 
-L'application sera ensuite accessible dans votre navigateur à l'adresse http://localhost:3000.
+L'application sera accessible dans votre navigateur à l'adresse http://localhost:3000.
 
 # Technologies Utilisées
 Onlyfun est construit en utilisant les technologies suivantes :
