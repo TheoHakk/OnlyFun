@@ -19,7 +19,7 @@ function MainPage() {
 
     return (
         <div>
-            {videoGames != null ? (
+            {!!videoGames ? (
                 <div>
                     <Header></Header>
                     <NavButtons></NavButtons>

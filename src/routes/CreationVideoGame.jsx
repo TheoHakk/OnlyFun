@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useRef} from "react";
 import * as PropTypes from "prop-types";
 import {Form} from "react-router-dom";
 
@@ -63,6 +63,7 @@ function goToMain() {
 }
 
 function CreationFrame() {
+
     const names = [
         "Nom du jeu",
         "Lien de l'image",
@@ -104,6 +105,7 @@ function CreationFrame() {
 
 
     function handleValidation() {
+
         for (let i = 0; i < params.length; i++) {
             if (!videoGame[params[i]]) {
                 alert("le champ " + params[i] + " doit être rempli")
@@ -127,7 +129,7 @@ function CreationFrame() {
     return (
         <div className="h-screen w-full flex flex-col items-center justify-center">
             <div className="w-2/3 p-4 shadow-md ">
-                <form>
+                <form onSubmit={(e) => e.preventDefault()}>
                     {names.map((x, index) =>
                         <InputVideoGame
                             name={x} number={index} onChange={(e) => handleInputChanged(params[index], e.target.value)}>

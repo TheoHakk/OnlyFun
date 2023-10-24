@@ -34,9 +34,10 @@ app.get('/GetAllVideoGames', (req, res) => {
 });
 
 app.get('/GetCommentaries', (req, res) => {
-    const sqlQuery = `SELECT * FROM Commentaries WHERE VideoGameID = ${req.query.id}`;
+    const sqlQuery = `SELECT * FROM Commentaries WHERE VideoGameID = (?)`;
+    const id = req.query.id;
 
-    db.all(sqlQuery, (err, rows) => {
+    db.all(sqlQuery, id,(err, rows) => {
         console.log(rows);
         res.json(rows);
     });
