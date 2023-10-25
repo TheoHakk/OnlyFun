@@ -14,10 +14,10 @@ app.listen(port, () => {
 });
 
 app.get('/GetVideoGame', (req, res) => {
-
     const sqlQuery = `SELECT * FROM VideoGame WHERE ID = (?)`;
+    const id = req.query.id;
 
-    db.all(sqlQuery, req.query.id, (err, rows) => {
+    db.all(sqlQuery, id, (err, rows) => {
         //Check if the rows are empty
         if(rows.length === 0)
             res.sendStatus(404);

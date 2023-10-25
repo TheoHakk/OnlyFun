@@ -4,7 +4,6 @@ import {useCurrentCommentaryContext} from "./ContextCommentary";
 
 export default function CommentarySection() {
     const {id} = useParams();
-    console.log(id + " id trouvé dans commentarySection");
     return (
         <div className="flex flex-col items-center justify-center">
             <Commentaries/>
@@ -15,12 +14,10 @@ export default function CommentarySection() {
 
 function Commentaries() {
     const {commentaries} = useCurrentCommentaryContext();
-    console.log(commentaries);
-    //C ok pour le moment
     return (
         <div
             className="flex flex-col content-start rounded border-solid border-2  w-2/3 p-2  shadow-xl overflow-auto">
-            {commentaries.map((x) =>
+            {commentaries[0].map((x) =>
                 <Commentary source={x.PictureSource} name={x.Name} date={x.Date}
                             commentary={x.Commentary}></Commentary>)}
         </div>
@@ -46,19 +43,14 @@ function Commentary(props) {
 }
 
 function NewCommentary(props) {
-
-    const {commentaries, setCommentaries} = useCurrentCommentaryContext();
+    const {commentaries, setCommentaries} = useCurrentCommentaryContext()
     const [name, setName] = useState(""); // État pour le nom
-    //C'est le commentaire que je vais ensuite envoyer au serveur, c'est juste une variable temporaire
     const [commentary, setCommentary] = useState("");
 
-    const handleNameChange = (e) => {
-        setName(e.target.value); //Va aller récupérér la valeur de son origine, un peu comme un délégué
-    };
+    //TODO G UN SOUCI ICI
 
-    const handleCommentaryChange = (e) => {
-        setCommentary(e.target.value);
-    };
+    const handleNameChange = (e) => setName(e.target.value); //Va aller récupérér la valeur de son origine, un peu comme un délégué
+    const handleCommentaryChange = (e) => setCommentary(e.target.value);
 
     const sendNewCommentary = () => {
         if (commentary !== "" && name !== "") {
@@ -69,7 +61,8 @@ function NewCommentary(props) {
                 Commentary: commentary,
                 PictureSource: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
             };
-            setCommentaries([...commentaries, newCommentary]);
+
+            setCommentaries([...commentaries[0], newCommentary]);
             setName("");
             setCommentary("");
             fetch('http://localhost:3001/PostNewCommentary', {
@@ -87,6 +80,7 @@ function NewCommentary(props) {
     };
 
     return (
+
         <div className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
             <input className="rounded border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text"
                    placeholder="Name" id="NewCommentaryName" onChange={handleNameChange}/>

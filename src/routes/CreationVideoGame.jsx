@@ -1,6 +1,4 @@
 import {useState, useRef} from "react";
-import * as PropTypes from "prop-types";
-import {Form} from "react-router-dom";
 
 
 function CreationVideoGame() {
@@ -63,7 +61,6 @@ function goToMain() {
 }
 
 function CreationFrame() {
-
     const names = [
         "Nom du jeu",
         "Lien de l'image",
@@ -74,18 +71,6 @@ function CreationFrame() {
         "Editeur",
         "Lien de la vidéo"
     ];
-    const [videoGame, setVideoGame] = useState(
-        {
-            Name: "",
-            ImageLink: "",
-            Description: "",
-            Genre: "",
-            ReleaseDate: "",
-            Developper: "",
-            Publisher: "",
-            VideoLink: ""
-        }
-    );
 
     const params = [
         "Name",
@@ -98,21 +83,29 @@ function CreationFrame() {
         "VideoLink"
     ];
 
+    const [videoGame, setVideoGame] = useState(
+        {
+            Name: "",
+            ImageLink: "",
+            Description: "",
+            Genre: "",
+            ReleaseDate: "",
+            Developper: "",
+            Publisher: "",
+            VideoLink: ""
+        }
+    );
     function handleInputChanged(param, value) {
         if (value)
             setVideoGame({...videoGame, [param]: value});
     }
 
-
     function handleValidation() {
-
-        for (let i = 0; i < params.length; i++) {
+        for (let i = 0; i < params.length; i++)
             if (!videoGame[params[i]]) {
                 alert("le champ " + params[i] + " doit être rempli")
                 return
             }
-        }
-        console.log("on y va")
         fetch('http://localhost:3001/PostNewVideoGame', {
             method: 'POST',
             headers: {
@@ -120,9 +113,8 @@ function CreationFrame() {
             },
             body: JSON.stringify(videoGame)
         }).then((response) => {
-            if (!response.ok) {
+            if (!response.ok)
                 throw new Error("HTTP error " + response.status);
-            }
         })
     }
 
@@ -141,7 +133,6 @@ function CreationFrame() {
             </div>
         </div>
     );
-
 }
 
 export default CreationVideoGame;
