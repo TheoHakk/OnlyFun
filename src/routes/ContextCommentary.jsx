@@ -7,7 +7,6 @@ const CurrentCommentaryContext = createContext(null);
 export default function ContextCommentary() {
 
     const {id} = useParams();
-    console.log(id + " id trouvé dans contextCommentary");
     const [commentaries, setCommentaries] = useState(null);
 
     useEffect(() => {
