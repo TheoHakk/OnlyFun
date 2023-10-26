@@ -7,6 +7,7 @@ const CurrentCommentaryContext = createContext(null);
 export default function ContextCommentary() {
 
     const {id} = useParams();
+    console.log(id + " id trouvé dans contextCommentary");
     const [commentaries, setCommentaries] = useState(null);
 
     useEffect(() => {
@@ -16,7 +17,7 @@ export default function ContextCommentary() {
             .then(([resCommentaries]) =>
                 Promise.all([resCommentaries.json()])
             )
-            .then((fetchedCommentaries) => {
+            .then(([fetchedCommentaries]) => {
                 setCommentaries(fetchedCommentaries);
             })
             .catch(error => {
