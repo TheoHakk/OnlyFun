@@ -13,7 +13,7 @@ app.listen(port, () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 });
 
-app.get('/GetVideoGame', (req, res) => {
+app.get('/VideoGame', (req, res) => {
     const sqlQuery = `SELECT * FROM VideoGame WHERE ID = (?)`;
     const id = req.query.id;
 
@@ -26,14 +26,14 @@ app.get('/GetVideoGame', (req, res) => {
     });
 });
 
-app.get('/GetAllVideoGames', (req, res) => {
+app.get('/AllVideoGames', (req, res) => {
     db.all(`SELECT ID, Name, Description, ImageLink FROM VideoGame`, (err, rows) => {
         console.log(rows);
         res.json(rows);
     });
 });
 
-app.get('/GetCommentaries', (req, res) => {
+app.get('/Commentaries', (req, res) => {
     const sqlQuery = `SELECT * FROM Commentaries WHERE VideoGameID = (?)`;
     const id = req.query.id;
 
@@ -43,7 +43,7 @@ app.get('/GetCommentaries', (req, res) => {
     });
 });
 
-app.post('/PostNewCommentary', (req, res) => {
+app.post('/NewCommentary', (req, res) => {
     const SqlQuery =
         "INSERT INTO Commentaries (VideoGameID, Name, Date, Commentary, PictureSource) VALUES (?, ?, ?, ?, ?)";
     const { id, Name, Date, Commentary, PictureSource } = req.body;
@@ -53,12 +53,25 @@ app.post('/PostNewCommentary', (req, res) => {
             console.log(err);
         else
             console.log("Commentaire ajouté")
+        res.send({result: "ok"})
     });
+});
 
+app.delete('/EraseCommentary', (req, res) => {
+    const sqlQuery = `DELETE FROM Commentaries WHERE ID = (?)`;
+    const id = req.query.id;
+
+    db.run(sqlQuery, id, (err) => {
+        if(err)
+            console.log(err);
+        else
+            console.log("Commentaire supprimé")
+        res.send({result: "ok"})
+    });
 });
 
 
-app.post('/PostNewVideoGame', (req, res) => {
+app.post('/NewVideoGame', (req, res) => {
     const SqlQuery =
         "INSERT INTO VideoGame (Name, ImageLink, Description, Genre, ReleaseDate, Developper, Publisher, VideoLink) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const { Name, ImageLink, Description, Genre, ReleaseDate, Developper, Publisher, VideoLink } = req.body;

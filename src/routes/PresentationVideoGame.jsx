@@ -14,7 +14,7 @@ function PresentationVideoGame() {
 
     useEffect(() => {
         Promise.all([
-            fetch(`http://localhost:3001/GetVideoGame?id=${id}`),
+            fetch(`http://localhost:3001/VideoGame?id=${id}`),
         ])
             .then(([resVideoGame]) =>
                 Promise.all([resVideoGame.json()])

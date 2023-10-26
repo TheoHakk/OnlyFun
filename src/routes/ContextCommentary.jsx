@@ -12,7 +12,7 @@ export default function ContextCommentary() {
 
     useEffect(() => {
         Promise.all([
-            fetch(`http://localhost:3001/GetCommentaries?id=${id}`)
+            fetch(`http://localhost:3001/Commentaries?id=${id}`)
         ])
             .then(([resCommentaries]) =>
                 Promise.all([resCommentaries.json()])

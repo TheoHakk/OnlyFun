@@ -106,7 +106,7 @@ function CreationFrame() {
                 alert("le champ " + params[i] + " doit être rempli")
                 return
             }
-        fetch('http://localhost:3001/PostNewVideoGame', {
+        fetch('http://localhost:3001/NewVideoGame', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

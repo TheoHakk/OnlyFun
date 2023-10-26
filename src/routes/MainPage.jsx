@@ -7,7 +7,7 @@ function MainPage() {
 
     useEffect(() => {
         Promise.all([
-            fetch(`http://localhost:3001/GetAllVideoGames`),
+            fetch(`http://localhost:3001/AllVideoGames`),
         ])
             .then(([resVideoGames]) =>
                 Promise.all([resVideoGames.json()])

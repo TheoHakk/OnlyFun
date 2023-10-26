@@ -14,29 +14,50 @@ export default function CommentarySection() {
 
 function Commentaries() {
     const {commentaries} = useCurrentCommentaryContext();
+
+
     return (
         <div
             className="flex flex-col content-start rounded border-solid border-2  w-2/3 p-2  shadow-xl overflow-auto">
-            {commentaries.map((x) =>
-                <Commentary source={x.PictureSource} name={x.Name} date={x.Date}
-                            commentary={x.Commentary}></Commentary>)}
+            {commentaries.map((commentary) =>
+                <Commentary object={commentary}></Commentary>)}
         </div>
     )
 }
 
 function Commentary(props) {
+
+    const commentary = props.object;
+    const {commentaries, setCommentaries} = useCurrentCommentaryContext();
+
+    function eraseCommentary() {
+        setCommentaries(commentaries.filter((x) => x.ID !== commentary.ID));
+
+        fetch('http://localhost:3001/EraseCommentary?id=' + commentary.ID, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                } else {
+                    console.log("Commentaire supprimé");
+                }
+            });
+    }
+
+
     return (
         <div className="flex flex-row p-2 w-full">
-            <img src={props.source} className="h-10 rounded-full m-1.5" alt={props.source}/>
+            <img src={commentary.PictureSource} className="h-10 rounded-full m-1.5" alt={commentary.PictureSource}/>
             <div className="rounded border-solid border-2 bg-slate-100 w-full pl-2 overflow-x-auto">
                 <div className="flex flex-row">
-                    <h1 className="mr-6 font-semibold">{props.name}</h1>
-                    <p className="font-extralight ">{props.date}</p>
+                    <h1 className="mr-6 font-semibold">{commentary.Name}</h1>
+                    <p className="font-extralight ">{commentary.Date}</p>
                 </div>
                 <div className="ml-8">
-                    <p>{props.commentary}</p>
+                    <p>{commentary.Commentary}</p>
                 </div>
-                <button>Reply</button>
+                <button onClick={eraseCommentary}>Effacer</button>
             </div>
         </div>
     )
@@ -61,9 +82,9 @@ function NewCommentary(props) {
             };
 
             setCommentaries([...commentaries, newCommentary]);
-            setName("");
-            setCommentary("");
-            fetch('http://localhost:3001/PostNewCommentary', {
+            // setName("");
+            // setCommentary("");
+            fetch('http://localhost:3001/NewCommentary', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,9 +98,13 @@ function NewCommentary(props) {
         }
     };
 
-    return (
+    function submitForm(e) {
+        e.preventDefault();
+        sendNewCommentary();
+    }
 
-        <div className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
+    return (
+        <form onSubmit={submitForm} className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
             <input className="rounded border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text"
                    placeholder="Name" id="NewCommentaryName" value={name} onChange={handleNameChange}/>
             <textarea className="rounded border-solid border-2 bg-slate-100 w-full pl-2 h-4/5"
@@ -91,9 +116,10 @@ function NewCommentary(props) {
                     active:border-b-[0px]
                     transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841]
                     rounded-full  border-[1px] border-blue-400'>
-                <span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg'
-                      onClick={sendNewCommentary}>Confirmer</span>
+                <button className='text-center h-full w-full text-white font-bold text-lg'>
+                    Envoyer
+                </button>
             </div>
-        </div>
+        </form>
     )
 }
