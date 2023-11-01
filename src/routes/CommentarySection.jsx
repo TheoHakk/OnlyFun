@@ -4,6 +4,11 @@ import {useCurrentCommentaryContext} from "./ContextCommentary";
 
 export default function CommentarySection() {
     const {id} = useParams();
+    const {commentaries} = useCurrentCommentaryContext();
+
+    //Check if we do not have commentaries
+    console.log(commentaries)
+
     return (
         <div className="flex flex-col items-center justify-center">
             <Commentaries/>
@@ -15,10 +20,9 @@ export default function CommentarySection() {
 function Commentaries() {
     const {commentaries} = useCurrentCommentaryContext();
 
-
     return (
         <div
-            className="flex flex-col content-start rounded border-solid border-2  w-2/3 p-2  shadow-xl overflow-auto">
+            className="flex flex-col content-start w-2/3 p-2 overflow-clip">
             {commentaries.map((commentary) =>
                 <Commentary object={commentary}></Commentary>)}
         </div>
@@ -44,10 +48,8 @@ function Commentary(props) {
                 }
             });
     }
-
-
     return (
-        <div className="flex flex-row p-2 w-full">
+        <div className="flex flex-row p-2 w-full shadow rounded-lg m-1">
             <img src={commentary.PictureSource} className="h-10 rounded-full m-1.5" alt={commentary.PictureSource}/>
             <div className="rounded border-solid border-2 bg-slate-100 w-full pl-2 overflow-x-auto">
                 <div className="flex flex-row">
@@ -68,9 +70,6 @@ function NewCommentary(props) {
     const [name, setName] = useState(""); // État pour le nom
     const [commentary, setCommentary] = useState("");
 
-    const handleNameChange = (e) => setName(e.target.value); //Va aller récupérér la valeur de son origine, un peu comme un délégué
-    const handleCommentaryChange = (e) => setCommentary(e.target.value);
-
     const sendNewCommentary = () => {
         if (commentary !== "" && name !== "") {
             const newCommentary = {
@@ -80,10 +79,8 @@ function NewCommentary(props) {
                 Commentary: commentary,
                 PictureSource: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
             };
-
             setCommentaries([...commentaries, newCommentary]);
-            // setName("");
-            // setCommentary("");
+
             fetch('http://localhost:3001/NewCommentary', {
                 method: 'POST',
                 headers: {
@@ -100,17 +97,21 @@ function NewCommentary(props) {
 
     function submitForm(e) {
         e.preventDefault();
+
+        const data = new FormData(e.target);
+        setName(data.get('name'))
+        setCommentary(data.get('commentary'))
+
         sendNewCommentary();
     }
 
     return (
-        <form onSubmit={submitForm} className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
+        <form onSubmit={submitForm}
+              className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
             <input className="rounded border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text"
-                   placeholder="Name" id="NewCommentaryName" value={name} onChange={handleNameChange}/>
+                   placeholder="Nom" id="name" name="name" />
             <textarea className="rounded border-solid border-2 bg-slate-100 w-full pl-2 h-4/5"
-                      placeholder="Commentary" id="NewCommentaryCommentary"
-                      value={commentary}
-                      onChange={handleCommentaryChange}></textarea>
+                      placeholder="Commentaire" id="commentary" name="commentary" ></textarea>
             <div className='button content-center w-1/4 bg-blue-500 mb-3 mt-3  cursor-pointer select-none
                     active:translate-y-2  active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841]
                     active:border-b-[0px]

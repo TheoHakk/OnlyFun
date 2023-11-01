@@ -1,7 +1,7 @@
-import {useState, useRef} from "react";
+import {useState} from "react";
 
 
-function CreationVideoGame() {
+export default function CreationVideoGame() {
     return (
         <div>
             <Header></Header>
@@ -28,17 +28,18 @@ function Header() {
 }
 
 function InputVideoGame(props) {
+    const placeHolder = props.dataName.replace("-", " ");
+    const name = props.name.replace("-", "");
+
     return (
         <div className="bg-gray-100 rounded m-2 p-2">
-            <label htmlFor={props.name} className="block text-sm font-medium ml-2 text-gray-700">
-                {props.name}
+            <label className="block text-sm font-medium ml-2 text-gray-700">
+                {placeHolder}
             </label>
             <div className="mt-1">
                 <textarea
-                    name={props.name}
-                    id={props.name}
+                    name={name}
                     className="shadow-sm pl-1 focus:ring-indigo-500 focus:border-indigo-500 block w-4/5 ml-5 sm:text-sm border-gray-300 rounded-md"
-                    onChange={props.onChange}
                 />
             </div>
         </div>
@@ -61,51 +62,29 @@ function goToMain() {
 }
 
 function CreationFrame() {
-    const names = [
-        "Nom du jeu",
-        "Lien de l'image",
-        "Description",
-        "Genre",
-        "Date de sortie",
-        "Développeur",
-        "Editeur",
-        "Lien de la vidéo"
-    ];
-
     const params = [
         "Name",
-        "ImageLink",
+        "Image-Link",
         "Description",
         "Genre",
-        "ReleaseDate",
+        "Release-Date",
         "Developper",
         "Publisher",
-        "VideoLink"
+        "Video-Link"
     ];
 
-    const [videoGame, setVideoGame] = useState(
-        {
-            Name: "",
-            ImageLink: "",
-            Description: "",
-            Genre: "",
-            ReleaseDate: "",
-            Developper: "",
-            Publisher: "",
-            VideoLink: ""
-        }
-    );
-    function handleInputChanged(param, value) {
-        if (value)
-            setVideoGame({...videoGame, [param]: value});
-    }
 
-    function handleValidation() {
-        for (let i = 0; i < params.length; i++)
-            if (!videoGame[params[i]]) {
-                alert("le champ " + params[i] + " doit être rempli")
-                return
-            }
+    const paramsForObject = params.map(param => param.replace('-',''))
+    const initialVideoGame = Object.fromEntries(paramsForObject.map(param => [param, ""]));
+    const [videoGame, setVideoGame] = useState(initialVideoGame);
+
+    const handleValidation = (data) => {
+        const updatedVideoGame = {};
+        paramsForObject.forEach(param => {
+            updatedVideoGame[param] = data.get(param);
+        });
+        setVideoGame(updatedVideoGame);
+
         fetch('http://localhost:3001/NewVideoGame', {
             method: 'POST',
             headers: {
@@ -116,17 +95,22 @@ function CreationFrame() {
             if (!response.ok)
                 throw new Error("HTTP error " + response.status);
         })
+    };
+
+    function submitForm(e) {
+        const data = new FormData(e.target)
+        handleValidation(data)
     }
 
     return (
         <div className="h-screen w-full flex flex-col items-center justify-center">
             <div className="w-2/3 p-4 shadow-md ">
-                <form onSubmit={(e) => e.preventDefault()}>
-                    {names.map((x, index) =>
+                <form onSubmit={submitForm}>
+                    {params.map((param) =>
                         <InputVideoGame
-                            name={x} number={index} onChange={(e) => handleInputChanged(params[index], e.target.value)}>
+                            dataName={param} name={param}>
                         </InputVideoGame>)}
-                    <button onClick={handleValidation}>
+                    <button>
                         Valider
                     </button>
                 </form>
@@ -134,5 +118,3 @@ function CreationFrame() {
         </div>
     );
 }
-
-export default CreationVideoGame;
