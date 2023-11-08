@@ -26,6 +26,17 @@ app.get('/VideoGame', (req, res) => {
     });
 });
 
+app.post('/Verify', (req, res) => {
+    const sqlQuery = 'SELECT * FROM Tokens WHERE Token = (?)'
+    const token = req.body.token;
+    db.all(sqlQuery, token, (err, rows) => {
+        if (rows.length === 0)
+            res.sendStatus(404);
+        else
+            res.sendStatus(200);
+    })
+});
+
 app.get('/AllVideoGames', (req, res) => {
     db.all(`SELECT ID, Name, Description, ImageLink FROM VideoGame`, (err, rows) => {
         //console.log(rows);
@@ -86,13 +97,14 @@ app.post('/Login', (req, res) => {
                     //I know we will have only one line because of the username and password
                     userId = row.Id;
                     console.log("userId : " + userId);
-                    require('crypto').randomBytes(48, function(err, buffer) {
+                    require('crypto').randomBytes(48, function (err, buffer) {
                         token = buffer.toString('hex');
                         storeToken(token, userId);
                         res.send({token: token});
                     });
                 });
             }
+            res.sendStatus(200);
         }
     });
 });

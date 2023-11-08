@@ -1,7 +1,6 @@
-
 import PropTypes from 'prop-types';
 
-export default function Connection({ setToken }) {
+export default function Connection({setToken}) {
     return (
         <div>
             <Header></Header>
@@ -12,7 +11,6 @@ export default function Connection({ setToken }) {
 
 
 async function loginUser(credentials) {
-    console.log(credentials);
     return fetch('http://localhost:3001/Login', {
         method: 'POST',
         headers: {
@@ -21,8 +19,9 @@ async function loginUser(credentials) {
         body: JSON.stringify(credentials)
     })
         .then(data => {
+            console.log("data : " + data);
             return data.json();
-        })
+        });
 }
 
 function Header() {
@@ -41,7 +40,6 @@ function Header() {
 
 
 function ConnectionTile({setToken}) {
-
     function submitLogin(e) {
         e.preventDefault();
 
