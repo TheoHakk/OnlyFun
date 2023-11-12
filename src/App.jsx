@@ -59,7 +59,7 @@ function InnerApp() {
         {
             path: "/",
             element:
-                <CurrentUserContext.Provider value={{user, setUser}}>
+                <CurrentUserContext.Provider value={{user}}>
                     <MainPage></MainPage>
                 </CurrentUserContext.Provider>,
             errorElement: <Error></Error>
@@ -67,7 +67,9 @@ function InnerApp() {
         {
             path: "/presentation/:id",
             element:
-                <Presentation></Presentation>,
+                <CurrentUserContext.Provider value={{user}}>
+                    <Presentation></Presentation>
+                </CurrentUserContext.Provider>,
             errorElement: <Error></Error>
         },
         {

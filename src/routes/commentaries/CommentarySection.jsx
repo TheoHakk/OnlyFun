@@ -1,6 +1,8 @@
 import {useState} from "react";
 import {useParams} from "react-router-dom";
 import {useCurrentCommentaryContext} from "./ContextCommentary";
+import {useCurrentUserContext} from "../../App";
+import {flushSync} from "react-dom";
 
 export default function CommentarySection() {
     const {id} = useParams();
@@ -44,6 +46,7 @@ function Commentary(props) {
                 }
             });
     }
+
     return (
         <div className="flex flex-row p-2 w-full shadow rounded-lg m-1">
             <img src={commentary.PictureSource} className="h-10 rounded-full m-1.5" alt={commentary.PictureSource}/>
@@ -62,21 +65,20 @@ function Commentary(props) {
 }
 
 function NewCommentary(props) {
-    const {commentaries, setCommentaries} = useCurrentCommentaryContext()
-    const [name, setName] = useState(""); // État pour le nom
-    const [commentary, setCommentary] = useState("");
+    const {commentaries, setCommentaries} = useCurrentCommentaryContext();
+    const {user} = useCurrentUserContext();
+    let commentary;
 
-    const sendNewCommentary = () => {
-        if (commentary !== "" && name !== "") {
+    function sendNewCommentary() {
+        if (commentary !== "" && !!user) {
             const newCommentary = {
                 id: props.id,
-                Name: name,
+                Name: user.username,
                 Date: Date().toLocaleString().split(" ")[2] + "/" + Date().toLocaleString().split(" ")[1] + "/" + Date().toLocaleString().split(" ")[3],
                 Commentary: commentary,
                 PictureSource: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
             };
             setCommentaries([...commentaries, newCommentary]);
-
             fetch('http://localhost:3001/NewCommentary', {
                 method: 'POST',
                 headers: {
@@ -89,29 +91,27 @@ function NewCommentary(props) {
                 }
             })
         }
-    };
+    }
 
     function submitForm(e) {
         e.preventDefault();
-
         const data = new FormData(e.target);
-        setName(data.get('name'))
-        setCommentary(data.get('commentary'))
-
-        sendNewCommentary();
+        if (!(commentary === data.get("commentary"))) {
+            commentary = data.get("commentary");
+            sendNewCommentary();
+        }
     }
 
     return (
         <form onSubmit={submitForm}
               className="flex flex-col content-start rounded border-solid border-2  w-1/2 h-60 p-2 mt-6 shadow-xl">
-            <input className="rounded border-solid border-2 bg-slate-100 pl-2 mb-2 w-1/4" type="text"
-                   placeholder="Nom" id="name" name="name" />
             <textarea className="rounded border-solid border-2 bg-slate-100 w-full pl-2 h-4/5"
-                      placeholder="Commentaire" id="commentary" name="commentary" ></textarea>
+                      placeholder="Commentaire" id="commentary" name="commentary">
+            </textarea>
             <div className='button content-center w-1/4 bg-blue-500 mb-3 mt-3  cursor-pointer select-none
                     active:translate-y-2  active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841]
                     active:border-b-[0px]
-                    transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841]
+                    transition-all duration-50 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841]
                     rounded-full  border-[1px] border-blue-400'>
                 <button className='text-center h-full w-full text-white font-bold text-lg'>
                     Envoyer
