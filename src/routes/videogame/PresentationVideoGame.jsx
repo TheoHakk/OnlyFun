@@ -1,12 +1,12 @@
-import '../index.css';
-import '../output.css';
+import '../../index.css';
+import '../../output.css';
 
-import CommentarySection from "./CommentarySection";
-import {useState, useEffect, createContext, useContext} from "react";
+import {useState, useEffect, createContext} from "react";
 import {useParams} from "react-router-dom";
-import ContextCommentary from "./ContextCommentary";
-
+import ContextCommentary from "../commentaries/ContextCommentary";
 const CurrentVideoGameContext = createContext(null);
+
+
 
 function PresentationVideoGame() {
     const {id} = useParams();

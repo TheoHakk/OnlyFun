@@ -1,5 +1,6 @@
-import '../App.css';
+import '../../App.css';
 import {useEffect, useState} from "react";
+import {useCurrentUserContext} from "../../App.jsx";
 
 
 function MainPage() {
@@ -22,6 +23,7 @@ function MainPage() {
             {!!videoGames ? (
                 <div>
                     <Header></Header>
+                    <UserInformations></UserInformations>
                     <NavButtons></NavButtons>
                     <VideoGameCards videoGames={videoGames}></VideoGameCards>
                 </div>
@@ -31,20 +33,56 @@ function MainPage() {
         </div>
     );
 }
+
 function NavButtons() {
     return (
         <div className="flex flex-row justify-center w-full h-20 mb-10 ">
-            <button onClick={goToCreation} className="hover:text-gray-400 dark:bg-gray-900 dark:text-white rounded bg-gray-200 text-xl p-2 font-light transition-all hover:shadow-2xl">Créer une nouvelle publication</button>
+            <button onClick={goToCreation}
+                    className="hover:text-gray-400 dark:bg-gray-900 dark:text-white rounded bg-gray-200 text-xl p-2 font-light transition-all hover:shadow-2xl">Créer
+                une nouvelle publication
+            </button>
         </div>
     );
 }
+
+function UserInformations() {
+    const {user} = useCurrentUserContext();
+    console.log("user object");
+    console.log(user);
+    console.log("user name");
+
+    function disconnect() {
+        sessionStorage.removeItem("token");
+        window.location.href = "/";
+    }
+
+    return (
+        <div>
+            {!!user ? (
+                <div className="flex justify-between mb-8 p-5">
+                    <p className="font-bold ">
+                        Bienvenue {user.username}
+                    </p>
+                    <button onClick={disconnect}
+                            className="hover:text-gray-400 dark:bg-gray-900 dark:text-white rounded bg-gray-200 text-xl p-2 font-light transition-all hover:shadow-2xl">Se
+                        déconnecter
+                    </button>
+                </div>
+            ) : (
+                <p>Chargement en cours...</p>
+            )}
+        </div>
+
+    );
+}
+
 
 function VideoGameCards(props) {
     return (
         <div className="flex flex-col items-center justify-center w-full h-full overflow-x-auto  ">
             <div className="flex flex-wrap justify-center w-full max-w-6xl">
-                {props.videoGames.map((x) =>
-                    <VideoGameCard source={x.ImageLink} description={x.Description} id={x.ID} videoGameName={x.Name}/>)}
+                {props.videoGames.map((videoGame) =>
+                    <VideoGameCard source={videoGame.ImageLink} description={videoGame.Description} id={videoGame.ID} videoGameName={videoGame.Name}/>)}
             </div>
         </div>
     );
@@ -53,7 +91,8 @@ function VideoGameCards(props) {
 function Header() {
     return (
         <div>
-            <div className="mb-10 flex flex-col items-center justify-center w-full h-52 bg-gray-100 dark:bg-gray-900 shadow-2xl">
+            <div
+                className="mb-10 flex flex-col items-center justify-center w-full h-52 bg-gray-100 dark:bg-gray-900 shadow-2xl">
                 <div className="flex flex-col items-center justify-center">
                     <h1 className="text-5xl font-bold text-center text-gray-800 dark:text-white md:text-6xl">
                         Welcome to OnlyFun</h1>
@@ -82,8 +121,6 @@ function VideoGameCard(props) {
             </div>
         </a>
     );
-
-
 }
 
 

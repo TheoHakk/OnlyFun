@@ -2,6 +2,11 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require("bcrypt")
+const crypto = require('crypto')
+
+const MINUTES = 15;
+const expiration = MINUTES * 60 * 1000;
 
 app.use(express.json());
 app.use(cors());
@@ -18,7 +23,6 @@ app.get('/VideoGame', (req, res) => {
     const id = req.query.id;
 
     db.all(sqlQuery, id, (err, rows) => {
-        //Check if the rows are empty
         if (rows.length === 0)
             res.sendStatus(404);
         else
@@ -27,15 +31,38 @@ app.get('/VideoGame', (req, res) => {
 });
 
 app.post('/Verify', (req, res) => {
-    const sqlQuery = 'SELECT * FROM Tokens WHERE Token = (?)'
+    const sqlQuery = 'SELECT * FROM Tokens WHERE Token = (?)';
+    const sqlQuery2 = 'SELECT * FROM Users WHERE Id = (SELECT UserID FROM Tokens WHERE Token = (?))';
     const token = req.body.token;
     db.all(sqlQuery, token, (err, rows) => {
         if (rows.length === 0)
             res.sendStatus(404);
         else
-            res.sendStatus(200);
-    })
-});
+            rows.map((row) => {
+                if ((row.Creation + expiration) < (new Date()).getTime()) {
+                    eraseToken(row.Id);
+                    res.sendStatus(404);
+                }else{
+                    db.all(sqlQuery2, token, (err, rows) => {
+                        if (rows.length === 0)
+                            res.sendStatus(404);
+                        else
+                            res.json(rows);
+                    });
+                }
+            });
+    });
+})
+
+function eraseToken(id){
+    const sqlQuery = `DELETE FROM Tokens WHERE ID = (?)`;
+    db.run(sqlQuery, id, (err) => {
+        if (err)
+            console.log(err);
+        else
+            console.log("Token supprimé")
+    });
+}
 
 app.get('/AllVideoGames', (req, res) => {
     db.all(`SELECT ID, Name, Description, ImageLink FROM VideoGame`, (err, rows) => {
@@ -69,8 +96,8 @@ app.post('/NewCommentary', (req, res) => {
 
 function storeToken(token, userId) {
     const SqlQuery =
-        "INSERT INTO Tokens (Token, UserID) VALUES (?, ?)";
-    db.run(SqlQuery, [token, userId], (err) => {
+        "INSERT INTO Tokens (Token, UserID, Creation) VALUES (?, ?, ?)";
+    db.run(SqlQuery, [token, userId, (new Date()).getTime()], (err) => {
         if (err)
             console.log(err);
         else
@@ -79,52 +106,75 @@ function storeToken(token, userId) {
 }
 
 app.post('/Login', (req, res) => {
-    console.log("body :" + req.body);
-    let token = req.body;
+    let credential = req.body;
 
     const SqlQuery =
-        "SELECT * FROM USERS WHERE Username = (?) AND Password = (?)";
-    let userId;
+        "SELECT Password, Id FROM Users WHERE Username = (?)"
 
-    db.all(SqlQuery, [token.username, token.password], (err, rows) => {
-        if (err)
+    db.all(SqlQuery, credential.username, (err, rows) => {
+        if (err) {
             console.log(err);
-        else {
-            if (rows.length === 0)
-                res.sendStatus(404);
-            else {
-                rows.map((row) => {
-                    //I know we will have only one line because of the username and password
-                    userId = row.Id;
-                    console.log("userId : " + userId);
-                    require('crypto').randomBytes(48, function (err, buffer) {
-                        token = buffer.toString('hex');
-                        storeToken(token, userId);
-                        res.send({token: token});
-                    });
-                });
-            }
-            res.sendStatus(200);
+        } else if (rows.length === 0) {
+            console.log("user not found")
+            res.sendStatus(404);
+        } else {
+            rows.map((row) => {
+                console.log(row)
+                comparePassword(credential.password, row.Password).then((result) => {
+                    if (result) {
+                        console.log("user found & password match")
+                        crypto.randomBytes(48, function (err, buffer) {
+                            credential = buffer.toString('hex');
+                            storeToken(credential, row.Id);
+                            res.status(200).send({token: credential}); // Envoyez une réponse 200 avec le jeton
+                        });
+                    } else {
+                        res.sendStatus(404);
+                    }
+                })
+            });
         }
     });
 });
 
+async function comparePassword(plaintextPassword, hash) {
+    return await bcrypt.compare(plaintextPassword, hash);
+}
+
+
 app.post('/NewUser', (req, res) => {
     const token = req.body;
-    console.log("token user; " + token.username);
-    console.log("token pwd ; " + token.password);
+
     const SqlQuery =
         "INSERT INTO USERS (Username, Password) VALUES (?, ?);"
-    const username = token.username;
-    const password = token.password;
+    const SqlQueryVerification =
+        "SELECT * FROM USERS WHERE Username = (?);"
 
-    db.run(SqlQuery, [username, password], (err) => {
-        if (err)
-            console.log(err);
-        else
-            console.log("User ajouté")
-        res.send({result: "ok"})
-    });
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(token.password, salt, function (err, hash) {
+            db.all(SqlQueryVerification, token.username, (err, rows) => {
+                if (err)
+                    console.log(err)
+                else {
+                    console.log(rows)
+                    if (rows.length !== 0) {
+                        console.log("user already exists")
+                        res.sendStatus(404);
+                    } else {
+                        db.run(SqlQuery, [token.username, hash], (err) => {
+                            if (err)
+                                console.log(err);
+                            else
+                                console.log("User ajouté")
+                            res.send({result: "ok"})
+                        });
+                    }
+                }
+            });
+        });
+    })
+
+
 });
 
 app.delete('/EraseCommentary', (req, res) => {

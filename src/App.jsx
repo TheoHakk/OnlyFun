@@ -6,32 +6,50 @@ import {
 } from "react-router-dom"
 
 
-import MainPage from "./routes/MainPage";
-import Creation from "./routes/CreationVideoGame";
-import Presentation from "./routes/PresentationVideoGame";
-import Error from "./routes/Error";
-import Connection from "./routes/Connection";
-import useToken from "./routes/useToken";
+import MainPage from "./routes/videogame/MainPage";
+import Creation from "./routes/videogame/CreationVideoGame";
+import Presentation from "./routes/videogame/PresentationVideoGame";
+import Error from "./routes/error/Error";
+import Connection from "./routes/connection/Connection";
+import useToken from "./routes/token/useToken";
+import {createContext, useContext, useEffect, useState} from "react";
+
+const CurrentUserContext = createContext(null);
 
 function InnerApp() {
+    const [user, setUser] = useState(null);
     const {token, setToken} = useToken();
-    console.log("token : " + token);
+    let proofOfWork = null;
 
-    fetch(`http://localhost:3001/Verify`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({token: token})
-    })
-        .then(data => {
-            if (data.status === 200) {
-                console.log('token valid');
-            } else {
-                console.log('token not valid');
-                setToken("null");
-            }
-        });
+
+    useEffect(() => {
+        fetch(`http://localhost:3001/Verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({token: token})
+        })
+            .then(data => {
+                if (data.status === 404) {
+                    console.log('token not valid');
+                    setToken("null");
+                } else {
+                    let User = null;
+                    data.json().then(data => {
+                        console.log(data);
+                        User = {
+                            username: data[0].Username,
+                            id: data[0].Id
+                        }
+                        console.log("User");
+                        console.log(User);
+                        setUser(User);
+                        proofOfWork = "yep";
+                    })
+                }
+            });
+    }, [proofOfWork]);
 
 
     if (!token)
@@ -40,17 +58,22 @@ function InnerApp() {
     const router = createBrowserRouter([
         {
             path: "/",
-            element: <MainPage></MainPage>,
+            element:
+                <CurrentUserContext.Provider value={{user, setUser}}>
+                    <MainPage></MainPage>
+                </CurrentUserContext.Provider>,
             errorElement: <Error></Error>
         },
         {
             path: "/presentation/:id",
-            element: <Presentation></Presentation>,
+            element:
+                <Presentation></Presentation>,
             errorElement: <Error></Error>
         },
         {
             path: "/creation",
-            element: <Creation></Creation>,
+            element:
+                <Creation></Creation>,
             errorElement: <Error></Error>
         },
         {
@@ -69,4 +92,6 @@ export default function App() {
     );
 }
 
-
+export function useCurrentUserContext() {
+    return useContext(CurrentUserContext);
+}

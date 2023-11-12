@@ -4,10 +4,6 @@ import {useCurrentCommentaryContext} from "./ContextCommentary";
 
 export default function CommentarySection() {
     const {id} = useParams();
-    const {commentaries} = useCurrentCommentaryContext();
-
-    //Check if we do not have commentaries
-    console.log(commentaries)
 
     return (
         <div className="flex flex-col items-center justify-center">
